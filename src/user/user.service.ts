@@ -8,22 +8,13 @@ import { Repository } from 'typeorm';
 export class UserService {
   constructor(
     @InjectRepository(User)
-    private usersRepository: Repository<User>,
+    public usersRepository: Repository<User>,
   ) {}
 
-  async createUser(createUserDto: CreateUserDto): Promise<User> {
+  async listUser(req: any) {
     try {
-      // Return User entity
-      const user = this.usersRepository.create(createUserDto);
-      await this.usersRepository.save(user); // Save user and wait for completion
-      return user; // Return the saved user
-    } catch (error) {
-      // Handle specific error or rethrow as HttpException
-      throw new HttpException('Error creating user', HttpStatus.BAD_REQUEST);
-    }
-  }
-  async listUser() {
-    try {
+      console.log(req.user);
+
       // Return User entity
       const user = this.usersRepository.find();
       return user; // Return the saved user
