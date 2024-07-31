@@ -6,6 +6,7 @@ import {
   HttpException,
   HttpStatus,
   Param,
+  Post,
   Put,
   Req,
   UseGuards,
@@ -68,6 +69,16 @@ export class UserController {
     await this.userService.deleteUser(user_id);
     throw new HttpException(
       { message: 'User deleted successfully' },
+      HttpStatus.OK,
+    );
+  }
+
+  // Send Mail
+  @Post('/send-mail')
+  async sendMail(): Promise<any> {
+    await this.userService.sendMail();
+    throw new HttpException(
+      { message: 'Mail sent successfully' },
       HttpStatus.OK,
     );
   }

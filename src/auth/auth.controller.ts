@@ -6,6 +6,7 @@ import {
   Post,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
+import { CreateUserDto } from 'src/user/dto/create-user.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -13,7 +14,7 @@ export class AuthController {
 
   // Create a new user
   @Post('/signup')
-  async createUser(@Body() reqBody: any): Promise<void> {
+  async createUser(@Body() reqBody: CreateUserDto): Promise<void> {
     try {
       const user = await this.authService.createUser(reqBody);
       throw new HttpException(

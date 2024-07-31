@@ -3,12 +3,14 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './user.entity';
 import { Repository } from 'typeorm';
+import { MailerService } from '@nestjs-modules/mailer';
 
 @Injectable()
 export class UserService {
   constructor(
     @InjectRepository(User)
     public usersRepository: Repository<User>,
+    private readonly mailService: MailerService,
   ) {}
 
   // List Users
@@ -66,6 +68,20 @@ export class UserService {
       }
 
       return user;
+    } catch (error) {
+      throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
+    }
+  }
+
+  // Send Mail
+  async sendMail(): Promise<any> {
+    try {
+      return this.mailService.sendMail({
+        to: 'jerry@yopmail.com',
+        from: process.env.EMAIL_USERNAME,
+        subject: 'Test Message',
+        html: 'Test Message',
+      });
     } catch (error) {
       throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
     }
