@@ -15,7 +15,11 @@ import {
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { RolesGuardFactory } from './user.guard';
-import { ResponseTransformInterceptor } from './user.interceptor';
+import {
+  RequestTransformInterceptor,
+  ResponseTransformInterceptor,
+} from './user.interceptor';
+import { Request } from 'express';
 
 @Controller('user')
 export class UserController {
@@ -48,18 +52,13 @@ export class UserController {
 
   // Get User
   @Get('/:user_id')
-  @UseInterceptors(ResponseTransformInterceptor)
   @UseGuards(RolesGuardFactory(['member']))
-  async getUser(
-    @Param('user_id') user_id: string,
-    // @Res() res: Response,
-  ): Promise<any> {
+  async getUser(@Param('user_id') user_id: string): Promise<any> {
     const user: any = await this.userService.getUser(user_id);
-    return { user: user };
-    // throw new HttpException(
-    //   { message: 'User fetched successfully', data: user },
-    //   HttpStatus.OK,
-    // );
+    throw new HttpException(
+      { message: 'User fetched successfully', data: user },
+      HttpStatus.OK,
+    );
   }
 
   // Delete User
@@ -81,5 +80,22 @@ export class UserController {
       { message: 'Mail sent successfully' },
       HttpStatus.OK,
     );
+  }
+
+  // Interceptor manipulate Response
+  @Get('/interceptor-response/:user_id')
+  @UseInterceptors(ResponseTransformInterceptor)
+  async interceptorResponseManipulation(
+    @Param('user_id') user_id: string,
+  ): Promise<any> {
+    const user: any = await this.userService.getUser(user_id);
+    return { user: user };
+  }
+
+  // Interceptor manipulate Response
+  @Post('/interceptor-request')
+  @UseInterceptors(RequestTransformInterceptor)
+  async interceptorRequestManipulation(@Body() reqBody: any): Promise<any> {
+    return { data: reqBody };
   }
 }

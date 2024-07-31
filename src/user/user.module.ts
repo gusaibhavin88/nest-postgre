@@ -1,4 +1,9 @@
-import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
+import {
+  MiddlewareConsumer,
+  Module,
+  NestModule,
+  RequestMethod,
+} from '@nestjs/common';
 import { UserService } from './user.service';
 import { UserController } from './user.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -13,6 +18,18 @@ import { UserMiddleware } from './user.midlleware';
 })
 export class UserModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
-    consumer.apply(UserMiddleware).forRoutes('user');
+    consumer
+      .apply(UserMiddleware)
+      .exclude(
+        {
+          path: '/user/interceptor-request',
+          method: RequestMethod.POST,
+        },
+        {
+          path: '/user/interceptor-response/:user_id',
+          method: RequestMethod.GET,
+        },
+      )
+      .forRoutes('user');
   }
 }
