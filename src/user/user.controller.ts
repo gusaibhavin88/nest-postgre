@@ -3,16 +3,18 @@ import {
   Controller,
   Delete,
   Get,
-  HttpCode,
+  HttpException,
   HttpStatus,
   Param,
   Put,
   Req,
-  Res,
+  UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
-import { Response } from 'express'; // Correct import for Response
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
+import { RolesGuardFactory } from './user.guard';
+import { ResponseTransformInterceptor } from './user.interceptor';
 
 @Controller('user')
 export class UserController {
@@ -20,70 +22,53 @@ export class UserController {
 
   // List User
   @Get()
-  @HttpCode(HttpStatus.OK) // Set HTTP status code to 201 Created
-  async listUser(
-    @Req() req: any,
-    @Res() res: Response, // Use Response type from express
-  ): Promise<void> {
+  @UseGuards(RolesGuardFactory(['member']))
+  async listUser(@Req() req: any): Promise<void> {
     const user = await this.userService.listUser(req);
-    res.status(HttpStatus.CREATED).json({
-      success: true,
-      status: HttpStatus.CREATED,
-      message: 'Users fetched successfully',
-      data: user,
-    });
+    throw new HttpException(
+      { message: 'Users fetched successfully', data: user },
+      HttpStatus.OK,
+    );
   }
 
   // Update User
   @Put('/:user_id')
-  @HttpCode(HttpStatus.OK) // Set HTTP status code to 201 Created
+  @UseGuards(RolesGuardFactory(['member']))
   async updateUser(
     @Body() createUserData: CreateUserDto,
     @Param('user_id') user_id: string,
-    @Res() res: Response, // Use Response type from express
   ): Promise<any> {
-    console.log(user_id, 'vfffs');
-    // Use void as we're sending a response directly
     await this.userService.updateUser(createUserData, user_id);
-    res.status(HttpStatus.OK).json({
-      success: true,
-      status: HttpStatus.OK,
-      message: 'User updated successfully',
-      data: {},
-    });
+    throw new HttpException(
+      { message: 'User updated successfully' },
+      HttpStatus.OK,
+    );
   }
 
   // Get User
   @Get('/:user_id')
-  @HttpCode(HttpStatus.OK) // Set HTTP status code to 201 Created
+  @UseInterceptors(ResponseTransformInterceptor)
+  @UseGuards(RolesGuardFactory(['member']))
   async getUser(
     @Param('user_id') user_id: string,
-    @Res() res: Response, // Use Response type from express
+    // @Res() res: Response,
   ): Promise<any> {
-    // Use void as we're sending a response directly
     const user: any = await this.userService.getUser(user_id);
-    res.status(HttpStatus.OK).json({
-      success: true,
-      status: HttpStatus.OK,
-      message: 'User fetched successfully',
-      data: user,
-    });
+    return { user: user };
+    // throw new HttpException(
+    //   { message: 'User fetched successfully', data: user },
+    //   HttpStatus.OK,
+    // );
   }
 
   // Delete User
   @Delete('/:user_id')
-  @HttpCode(HttpStatus.OK) // Set HTTP status code to 201 Created
-  async deleteUser(
-    @Param('user_id') user_id: string,
-    @Res() res: Response, // Use Response type from express
-  ): Promise<any> {
-    // Use void as we're sending a response directly
+  @UseGuards(RolesGuardFactory(['admin']))
+  async deleteUser(@Param('user_id') user_id: string): Promise<any> {
     await this.userService.deleteUser(user_id);
-    res.status(HttpStatus.OK).json({
-      success: true,
-      status: HttpStatus.OK,
-      message: 'User deleted successfully',
-      data: null,
-    });
+    throw new HttpException(
+      { message: 'User deleted successfully' },
+      HttpStatus.OK,
+    );
   }
 }

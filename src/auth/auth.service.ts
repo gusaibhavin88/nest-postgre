@@ -31,7 +31,6 @@ export class AuthService {
     });
 
     reqBody.password = await bcrypt.hash(reqBody.password, 10);
-    console.log(reqBody.password);
     if (user) {
       throw new HttpException(
         { message: 'User already exist' },
@@ -63,7 +62,6 @@ export class AuthService {
           HttpStatus.NOT_FOUND,
         );
       }
-      console.log('huhhuhu');
 
       if (!user) {
         throw new HttpException(

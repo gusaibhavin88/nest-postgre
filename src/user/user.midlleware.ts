@@ -19,6 +19,7 @@ export class UserMiddleware implements NestMiddleware {
   async use(req: Request, res: Response, next: NextFunction) {
     try {
       let token: string;
+
       if (
         req.headers.authorization &&
         req.headers.authorization.startsWith('Bearer')
@@ -34,13 +35,13 @@ export class UserMiddleware implements NestMiddleware {
       });
 
       if (!currentUser) {
-        throw new UnauthorizedException('User not found');
+        throw new UnauthorizedException('Unauthorized User');
       }
 
       req['user'] = currentUser;
       next();
     } catch (err) {
-      next(err);
+      throw new UnauthorizedException('Unauthorized User');
     }
   }
 }

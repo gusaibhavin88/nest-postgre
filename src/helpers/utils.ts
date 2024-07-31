@@ -3,7 +3,6 @@ import * as dotenv from 'dotenv';
 dotenv.config();
 
 export const returnMessage = (msg: string) => {
-  console.log(appMessage);
   const message = appMessage[msg];
   return message;
 };

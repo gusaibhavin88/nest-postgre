@@ -11,37 +11,35 @@ export class UserService {
     public usersRepository: Repository<User>,
   ) {}
 
+  // List Users
   async listUser(req: any) {
     try {
       console.log(req.user);
-
-      // Return User entity
-      const user = this.usersRepository.find();
-      return user; // Return the saved user
+      const user = await this.usersRepository.find({});
+      return user;
     } catch (error) {
-      // Handle specific error or rethrow as HttpException
-      throw new HttpException('Error creating user', HttpStatus.BAD_REQUEST);
+      throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
     }
   }
+
+  // User Update
   async updateUser(
     createUserDto: CreateUserDto,
     params: string,
   ): Promise<User> {
     try {
       console.log(params, 'params');
-      // Return User entitys
       const user = this.usersRepository.create(createUserDto);
-      await this.usersRepository.save(user); // Save user and wait for completion
-      return user; // Return the saved user
+      await this.usersRepository.save(user);
+      return user;
     } catch (error) {
-      // Handle specific error or rethrow as HttpException
-      throw new HttpException('Error creating user', HttpStatus.BAD_REQUEST);
+      throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
     }
   }
 
+  // Get User
   async getUser(id: any): Promise<any> {
     try {
-      // Retrieve a user by id
       const user = await this.usersRepository.findOneBy({
         id,
       });
@@ -50,17 +48,15 @@ export class UserService {
         throw new HttpException('User not found', HttpStatus.NOT_FOUND);
       }
 
-      return user; // Return the found user
+      return user;
     } catch (error) {
-      // Handle error or rethrow as HttpException
-      throw new HttpException('Error retrieving user', HttpStatus.BAD_REQUEST);
+      throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
     }
   }
 
   // Delete user
   async deleteUser(id: any): Promise<any> {
     try {
-      // Retrieve a user by id
       const user = await this.usersRepository.delete({
         id,
       });
@@ -69,10 +65,9 @@ export class UserService {
         throw new HttpException('User not found', HttpStatus.NOT_FOUND);
       }
 
-      return user; // Return the found user
+      return user;
     } catch (error) {
-      // Handle error or rethrow as HttpException
-      throw new HttpException('Error retrieving user', HttpStatus.BAD_REQUEST);
+      throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
     }
   }
 }
